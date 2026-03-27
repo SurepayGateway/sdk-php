@@ -40,6 +40,11 @@
     $detailResult = gatewaySdk::detail('10921', 1);
     echo $detailResult;
 
+    // Here is an example of a balance
+    // return balance result: code=1,message=,data={...}
+    $balanceResult = gatewaySdk::balance();
+    echo $balanceResult;
+
     // Decrypt the encrypted information in the callback
     $jsonstr = gatewaySdk::symDecrypt("encryptedData .........");
     echo $jsonstr;

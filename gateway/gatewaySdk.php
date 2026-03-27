@@ -171,6 +171,36 @@ class gatewaySdk
         }
     }
 
+    /** Get merchant balance
+     * @return array [code,message,data]
+     */
+    public static function balance()
+    {
+        $result = array();
+        try {
+            $token = self::getToken();
+            if (self::isnull($token)) return $result;
+            $requestUrl = "gateway/" . gatewayCfg::$VERSION_NO . "/getBalance";
+            $cnst = self::generateConstant($requestUrl);
+            $bodyJson = "{}";
+            $base64ReqBody = self::sortedAfterToBased64($bodyJson);
+            $signature = self::createSignature($cnst, $base64ReqBody);
+            $encryptData = self::symEncrypt($base64ReqBody);
+            $json = ["data" => $encryptData];
+            $dict = self::post($requestUrl, $token, $signature, $json, $cnst["nonceStr"], $cnst["timestamp"]);
+            if (!self::isnull($dict["code"]) && strval($dict["code"]) == "1" && !self::isnull($dict["encryptedData"])) {
+                $result["data"] = self::symDecrypt($dict["encryptedData"]);
+            }
+            $result["code"] = "0";
+            $result["message"] = $dict["message"];
+            return $result;
+        } catch (Exception $e) {
+            $result["code"] = "0";
+            $result["message"] = $e->getMessage();
+            return $result;
+        }
+    }
+
     /** get server token
      * @return string
      */
